@@ -1,0 +1,15 @@
+{
+  "name": "foundry-guardian-linter",
+  "version": "1.0.0",
+  "description": "Detects non-Foundry components and suggests replacements",
+  "scripts": {
+    "build": "vite build && node copy-ui.js"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.123.0",
+    "@types/figma": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  }
+}

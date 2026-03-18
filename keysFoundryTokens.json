@@ -1,0 +1,112 @@
+[
+  {
+    "foundryName": ".ContainerTest",
+    "foundryKey": "71e14b7864910f1953f8f8da6942edacad593cfd",
+    "type": "COMPONENT"
+  },
+  {
+    "foundryName": "ComponentTest",
+    "foundryKey": "526e89c3d7e2bb9c4f7d725307fff016ce23cabb",
+    "type": "Component (via Instance)"
+  },
+  {
+    "foundryName": "Device Tags",
+    "foundryKey": "ad41c71058bff09d44d9cb89388b7c4bff241cd2",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "Devices",
+    "foundryKey": "5c4ec7e69746e23ba5c3e4c2c12e2fd84dd5ff4a",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "Divider",
+    "foundryKey": "0b5e1239b8124db6a4c90e8198d1f35f1259aa01",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "FDS Frame L1",
+    "foundryKey": "b87c028b6f04e9075cbcee21a3b6bee8c891e3bb",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "FDS Frame L2",
+    "foundryKey": "16f6d9d26da5e20c8571f73229c8e246c43dfac4",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "FDS Frame L3",
+    "foundryKey": "12ef54943c97605b8684fb0329f295b74572ffe2",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "FDS Frame L4",
+    "foundryKey": "3242cf493b1c44dc2cd6c76b2b629b134a920d63",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "FDS Frame L5",
+    "foundryKey": "dc3d4d8fdfd55fc956250b999cdda3620d9429d0",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "FDS logo",
+    "foundryKey": "85846f25df6d702d37835f672d9908e528e587f5",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "Fieldview Logo",
+    "foundryKey": "0d5f25f3b1676b86b0530d4a572bbae24a2c4366",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "Multi Slot Frame L1",
+    "foundryKey": "943274a7b58c1601a4da772ea05abc115e3aed45",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "Multi Slot Frame L2",
+    "foundryKey": "cd0361279efb902e7f7e2dcbbcf7cf3a01677d4e",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "Multi Slot Frame L3",
+    "foundryKey": "736cca3c82b73d29666303d0429ce34c76248706",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "Multi Slot Frame L4",
+    "foundryKey": "4e9bb009263790d56603127124afb9ed878d17f7",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "Multi Slot Frame L5",
+    "foundryKey": "47393a9cf4c70788cbc1f20e9ee9c4ed3cb0af97",
+    "type": "COMPONENT_SET"
+  },
+  {
+    "foundryName": "Project Cover Components (2025)",
+    "foundryKey": "ef1552b58b02a96d87605de0dad97da35a9ab033",
+    "type": "COMPONENT_SET (via Instance)"
+  },
+  {
+    "foundryName": "Slot",
+    "foundryKey": "d55e4cc5152e6f44f3a9ec8588adabab0966dd07",
+    "type": "COMPONENT"
+  },
+  {
+    "foundryName": "Tag - Deprecated",
+    "foundryKey": "662a10d859873e6ea6892658f5cf8cec9a7c14d9",
+    "type": "Component (via Instance)"
+  },
+  {
+    "foundryName": "Text holder",
+    "foundryKey": "6926dfdf59c590146c189623a827b3a1aba80e3d",
+    "type": "Component (via Instance)"
+  },
+  {
+    "foundryName": "stack_hexagon",
+    "foundryKey": "bcaef2d49e71c7a1950afbe8478d72386ca65a82",
+    "type": "COMPONENT_SET (via Instance)"
+  }
+]

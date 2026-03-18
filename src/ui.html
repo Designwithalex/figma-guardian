@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Foundry Guardian</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+      color: #1a1a2e; 
+      background: #f8f9fb;
+      font-size: 12px;
+      overflow-x: hidden;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      padding: 16px 16px 12px;
+    }
+    .header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header .subtitle {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      margin-top: 4px;
+    }
+
+    /* ===== HEALTH BAR ===== */
+    .health-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      background: white;
+      border-bottom: 1px solid #e8eaed;
+    }
+    .health-score {
+      font-size: 28px;
+      font-weight: 800;
+      min-width: 60px;
+    }
+    .health-score.good { color: #059669; }
+    .health-score.warn { color: #d97706; }
+    .health-score.bad { color: #dc2626; }
+    .health-meta {
+      flex: 1;
+      font-size: 10px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .health-meta strong { color: #1a1a2e; }
+    .progress-track {
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    /* ===== SCAN BUTTON ===== */
+    .scan-row {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e8eaed;
+      background: white;
+    }
+    .btn-scan {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      transition: all 0.2s;
+      letter-spacing: 0.3px;
+    }
+    .btn-scan:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.4); }
+    .btn-scan:active { transform: translateY(0); }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid #e8eaed;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 4px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #9ca3af;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tab:hover { color: #6366f1; }
+    .tab.active { color: #6366f1; border-bottom-color: #6366f1; }
+    .tab .tab-icon { font-size: 14px; display: block; margin-bottom: 2px; }
+    .tab .tab-badge {
+      display: inline-block;
+      background: #ef4444;
+      color: white;
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 8px;
+      margin-left: 3px;
+      font-weight: 700;
+    }
+
+    /* ===== PANELS ===== */
+    .panel { display: none; padding: 12px 16px; }
+    .panel.active { display: block; }
+
+    /* ===== CARDS ===== */
+    .card {
+      border: 1px solid #e8eaed;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: white;
+      border-left: 4px solid #e8eaed;
+      transition: all 0.2s;
+    }
+    .card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card.critical { border-left-color: #ef4444; }
+    .card.warning { border-left-color: #f59e0b; }
+    .card.info { border-left-color: #6366f1; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    /* Library badge */
+    .lib-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .lib-badge.red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .lib-badge.green { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+    .lib-badge.purple { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
+
+    .node-name {
+      font-weight: 600;
+      font-size: 12px;
+      margin-bottom: 2px;
+      word-break: break-all;
+    }
+    .real-name {
+      font-size: 10px;
+      color: #9ca3af;
+    }
+
+    /* ===== SUGGESTION BOX ===== */
+    .suggestion-box {
+      background: #f0f4ff;
+      border: 1px solid #dbe4ff;
+      padding: 8px;
+      border-radius: 6px;
+      margin: 8px 0;
+    }
+    .suggestion-label {
+      font-size: 9px;
+      color: #6b7280;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .suggestion-name {
+      color: #4f46e5;
+      font-weight: 600;
+      font-size: 11px;
+      margin: 3px 0;
+    }
+    .suggestion-score {
+      font-size: 9px;
+      color: #9ca3af;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 7px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #6366f1; color: white; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-ghost { background: transparent; color: #6b7280; border: 1px solid #e5e7eb; margin-top: 6px; }
+    .btn-ghost:hover { background: #f9fafb; }
+
+    /* ===== TOKEN CARD ===== */
+    .token-detail {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+      font-size: 11px;
+    }
+    .token-actual {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 600;
+    }
+    .token-arrow { color: #9ca3af; }
+    .token-expected {
+      background: #ecfdf5;
+      color: #059669;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    /* ===== GLOSSARY ===== */
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #6366f1; }
+
+    .glossary-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .glossary-name { font-weight: 600; font-size: 11px; color: #1a1a2e; }
+    .glossary-desc { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+    /* ===== SETTINGS ===== */
+    .setting-group {
+      margin-bottom: 16px;
+    }
+    .setting-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .setting-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: monospace;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: #9ca3af;
+    }
+    .empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+    .empty-state .msg { font-size: 12px; }
+
+    /* ===== SUCCESS STATE ===== */
+    .success-state {
+      background: #ecfdf5;
+      color: #059669;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ===== HISTORY ===== */
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 10px;
+    }
+    .history-row .date { color: #6b7280; }
+    .history-row .stat { font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>🛡️ Foundry Guardian</h1>
+    <div class="subtitle">Design Governance Engine</div>
+  </div>
+
+  <!-- HEALTH BAR -->
+  <div class="health-bar" id="health-bar" style="display:none">
+    <div class="health-score" id="health-score">—</div>
+    <div style="flex:1">
+      <div class="health-meta" id="health-meta"></div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%; background:#6366f1;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCAN -->
+  <div class="scan-row">
+    <button class="btn-scan" id="scan-btn">🔍 Scan Page</button>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-tab="components"><span class="tab-icon">📦</span>Components</div>
+    <div class="tab" data-tab="tokens"><span class="tab-icon">🎨</span>Tokens</div>
+    <div class="tab" data-tab="icons"><span class="tab-icon">🔍</span>Icons</div>
+    <div class="tab" data-tab="glossary"><span class="tab-icon">📖</span>Glossary</div>
+    <div class="tab" data-tab="extractor"><span class="tab-icon">🔑</span>Extractor</div>
+    <div class="tab" data-tab="settings"><span class="tab-icon">⚙️</span>Settings</div>
+  </div>
+
+  <!-- PANELS -->
+  <div class="panel active" id="panel-components">
+    <div class="empty-state" id="comp-empty">
+      <div class="icon">📦</div>
+      <div class="msg">Run a scan to see component compliance</div>
+    </div>
+    <div id="comp-list"></div>
+  </div>
+
+  <div class="panel" id="panel-tokens">
+    <div class="empty-state" id="token-empty">
+      <div class="icon">🎨</div>
+      <div class="msg">Run a scan to detect token violations</div>
+    </div>
+    <div id="token-list"></div>
+  </div>
+
+  <div class="panel" id="panel-icons">
+    <div class="empty-state" id="icon-empty">
+      <div class="icon">🔍</div>
+      <div class="msg">Run a scan to check icon compliance</div>
+    </div>
+    <div id="icon-list"></div>
+  </div>
+
+  <div class="panel" id="panel-glossary">
+    <input class="search-input" type="text" placeholder="Search Foundry glossary..." id="glossary-search">
+    <div id="glossary-list">
+      <div class="empty-state">
+        <div class="icon">📖</div>
+        <div class="msg">Loading glossary...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRACTOR PANEL -->
+  <div class="panel" id="panel-extractor">
+    <div id="extractor-gate">
+      <div class="empty-state">
+        <div class="icon">🔐</div>
+        <div class="msg">Enter admin password to access the Key Extractor</div>
+      </div>
+      <div style="padding:0 16px;">
+        <input class="setting-input" type="password" placeholder="Password..." id="extractor-password" style="margin-bottom:8px;">
+        <button class="btn btn-primary" id="extractor-unlock-btn" style="width:100%;">🔓 Unlock Extractor</button>
+        <div id="extractor-error" style="margin-top:8px; font-size:11px; color:#dc2626;"></div>
+      </div>
+    </div>
+    <div id="extractor-content" style="display:none;">
+      <div style="padding:16px;">
+        <div style="background:linear-gradient(135deg,#1e1b4b,#312e81); border-radius:12px; padding:16px; margin-bottom:16px; color:#e0e7ff;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:4px;">🔑 Key Extractor</div>
+          <div style="font-size:11px; opacity:0.8; line-height:1.4;">Open this plugin inside a Foundry library file, then click Extract. All component keys will be saved and used for future scans.</div>
+        </div>
+        <div class="card" style="border-left:3px solid #6366f1;">
+          <div style="font-size:11px; font-weight:600; margin-bottom:4px;">📊 Stored Keys</div>
+          <div id="extracted-count" style="font-size:24px; font-weight:800; color:#6366f1;">—</div>
+          <div style="font-size:10px; color:#9ca3af;">keys in clientStorage</div>
+        </div>
+        <button class="btn-scan" id="extract-btn" style="margin-top:12px; background:linear-gradient(135deg,#4f46e5,#7c3aed);">🔑 Extract Keys from this File</button>
+        <div id="extract-status" style="margin-top:12px; font-size:11px; color:#6b7280; text-align:center;"></div>
+        <div style="margin-top:16px; padding:12px; background:#fefce8; border-radius:8px; border:1px solid #fde68a;">
+          <div style="font-size:11px; font-weight:600; color:#92400e; margin-bottom:4px;">⚠️ Instructions</div>
+          <ol style="font-size:10px; color:#78350f; padding-left:16px; margin:0; line-height:1.6;">
+            <li>Open the <strong>Foundry Component Library</strong> file in Figma</li>
+            <li>Run this plugin and go to the Extractor tab</li>
+            <li>Click "Extract Keys" — all component keys will be saved</li>
+            <li>Repeat for <strong>Foundry Icons</strong> and <strong>Foundry Tokens</strong> libraries</li>
+            <li>Keys persist across sessions — re-extract when libraries update</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-settings">
+    <div class="setting-group">
+      <div class="setting-label">Scan History</div>
+      <div id="history-list"></div>
+      <button class="btn btn-ghost" id="load-history-btn">Load History</button>
+    </div>
+  </div>
+
+<script>
+  // ===== TAB NAVIGATION =====
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.getAttribute('data-tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + target).classList.add('active');
+    });
+  });
+
+  // ===== SCAN =====
+  document.getElementById('scan-btn').onclick = () => {
+    document.getElementById('scan-btn').textContent = '⏳ Scanning...';
+    parent.postMessage({ pluginMessage: { type: 'SCAN_PAGE' } }, '*');
+  };
+
+
+
+  // ===== LOAD HISTORY =====
+  document.getElementById('load-history-btn').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'GET_HISTORY' } }, '*');
+  };
+
+  // ===== GLOSSARY (built-in basic entries from Foundry) =====
+  const glossaryData = [
+    { name: 'Button Master', desc: 'Primary button component with all variants (Primary, Secondary, Ghost, Danger)' },
+    { name: 'Input', desc: 'Text input field with label, helper text, and validation states' },
+    { name: 'Card', desc: 'Container component for grouping related content' },
+    { name: 'Checkbox', desc: 'Selection control for boolean choices' },
+    { name: 'Radio master', desc: 'Selection control for mutually exclusive choices' },
+    { name: 'Toggle', desc: 'Switch control for on/off states' },
+    { name: 'Tag', desc: 'Label component for categorization and filtering' },
+    { name: 'Badge', desc: 'Small status indicator, typically used on icons or avatars' },
+    { name: 'Avatar', desc: 'User profile image placeholder' },
+    { name: 'Divider', desc: 'Horizontal or vertical separator line' },
+    { name: 'Dialog', desc: 'Modal dialog for confirmations and alerts' },
+    { name: 'Dropdown', desc: 'Select menu for choosing from a list of options' },
+    { name: 'List item', desc: 'Row component for lists and menus' },
+    { name: 'Popover', desc: 'Floating panel for contextual information' },
+    { name: 'Progress linear', desc: 'Linear progress indicator for loading states' },
+    { name: 'Slider', desc: 'Range input control for numeric values' },
+    { name: 'Tab group', desc: 'Navigation tabs for switching between views' },
+    { name: 'Text Area', desc: 'Multi-line text input field' },
+    { name: 'Spacer', desc: 'Foundry spacing token component for consistent layouts' },
+    { name: 'Side Nav', desc: 'Vertical navigation sidebar component' },
+    { name: 'Coachmark', desc: 'Onboarding tooltip for feature discovery' },
+    { name: 'FDS Frame L1-L5', desc: 'Foundry Design System frame containers with built-in token spacing' },
+    { name: 'Multi Slot Frame', desc: 'Flexible layout frame with configurable slots and orientations' },
+  ];
+
+  function renderGlossary(filter) {
+    const list = document.getElementById('glossary-list');
+    const filtered = filter 
+      ? glossaryData.filter(g => g.name.toLowerCase().includes(filter.toLowerCase()) || g.desc.toLowerCase().includes(filter.toLowerCase()))
+      : glossaryData;
+    
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="msg">No matches found</div></div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(g => `
+      <div class="glossary-item">
+        <div class="glossary-name">${g.name}</div>
+        <div class="glossary-desc">${g.desc}</div>
+      </div>
+    `).join('');
+  }
+
+  renderGlossary('');
+  document.getElementById('glossary-search').oninput = (e) => renderGlossary(e.target.value);
+
+  // ===== MESSAGE HANDLER =====
+  window.onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'SCAN_RESULTS') {
+      renderResults(msg.data);
+    } else if (msg.type === 'COPY_TO_CLIPBOARD') {
+      copyTextToClipboard(msg.text);
+    } else if (msg.type === 'HISTORY_RESULTS') {
+      renderHistory(msg.data);
+    } else if (msg.type === 'EXTRACT_RESULT') {
+      const statusEl = document.getElementById('extract-status');
+      const btn = document.getElementById('extract-btn');
+      btn.disabled = false;
+      btn.textContent = '🔑 Extract Keys from this File';
+      if (msg.success) {
+        statusEl.innerHTML = '<span style="color:#059669">' + msg.message + '</span>';
+        document.getElementById('extracted-count').textContent = msg.count || '—';
+      } else {
+        statusEl.innerHTML = '<span style="color:#dc2626">' + msg.message + '</span>';
+      }
+    } else if (msg.type === 'EXTRACTED_COUNT') {
+      document.getElementById('extracted-count').textContent = msg.count || '0';
+    }
+  };
+
+  // ===== RENDER RESULTS =====
+  function renderResults(data) {
+    document.getElementById('scan-btn').textContent = '🔍 Scan Page';
+
+    // Health bar
+    const healthBar = document.getElementById('health-bar');
+    healthBar.style.display = 'flex';
+    const scoreEl = document.getElementById('health-score');
+    const score = data.summary.healthScore;
+    scoreEl.textContent = score + '%';
+    scoreEl.className = 'health-score ' + (score >= 80 ? 'good' : score >= 50 ? 'warn' : 'bad');
+
+    document.getElementById('health-meta').innerHTML = 
+      '<strong>' + data.summary.foundryCount + '</strong> Foundry · ' +
+      '<strong>' + data.summary.legacyCount + '</strong> Non-Foundry · ' +
+      '<strong>' + data.summary.tokenErrors + '</strong> Token Issues · ' +
+      '<strong>' + data.summary.iconErrors + '</strong> Icon Issues';
+
+    const fill = document.getElementById('progress-fill');
+    fill.style.width = score + '%';
+    fill.style.background = score >= 80 ? '#059669' : score >= 50 ? '#d97706' : '#dc2626';
+
+    // Update tab badges
+    updateTabBadge('components', data.summary.legacyCount);
+    updateTabBadge('tokens', data.summary.tokenErrors);
+    updateTabBadge('icons', data.summary.iconErrors);
+
+    // Render Component panel
+    renderComponents(data.componentIssues);
+
+    // Render Token panel
+    renderTokens(data.tokenIssues);
+
+    // Render Icon panel
+    renderIcons(data.iconIssues);
+  }
+
+  function updateTabBadge(tabName, count) {
+    const tab = document.querySelector('[data-tab="' + tabName + '"]');
+    const existing = tab.querySelector('.tab-badge');
+    if (existing) existing.remove();
+    if (count > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'tab-badge';
+      badge.textContent = count;
+      tab.appendChild(badge);
+    }
+  }
+
+  // ===== RENDER COMPONENTS =====
+  function renderComponents(issues) {
+    const empty = document.getElementById('comp-empty');
+    const list = document.getElementById('comp-list');
+
+    if (issues.length === 0) {
+      empty.style.display = 'none';
+      list.innerHTML = '<div class="success-state">All components are Foundry compliant! ✅</div>';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = '<div style="margin-bottom:8px;font-size:11px;font-weight:600;">Found ' + issues.length + ' non-compliant components</div>';
+
+    issues.forEach(issue => {
+      const el = document.createElement('div');
+      el.className = 'card critical';
+
+      el.innerHTML = `
+        <div class="card-header">
+          <span class="lib-badge red">🔴 ${issue.flag ? issue.flag.label : issue.libraryName}</span>
+        </div>
+        <div class="node-name">${issue.name}</div>
+        <div class="real-name">Master: ${issue.realName}</div>
+        <button class="btn btn-ghost goto-btn" data-node="${issue.id}">Select Layer</button>
+      `;
+      list.appendChild(el);
+    });
+
+    list.querySelectorAll('.goto-btn').forEach(btn => {
+      btn.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: 'FOCUS_NODE', nodeId: btn.dataset.node } }, '*');
+      };
+    });
+  }
+
+  // ===== RENDER TOKENS =====
+  function renderTokens(issues) {
+    const empty = document.getElementById('token-empty');
+    const list = document.getElementById('token-list');
+
+    if (issues.length === 0) {
+      empty.style.display = 'none';
+      list.innerHTML = '<div class="success-state">All spacing values use Foundry tokens! ✅</div>';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = '<div style="margin-bottom:8px;font-size:11px;font-weight:600;">' + issues.length + ' token violations found</div>';
+
+    issues.forEach(issue => {
+      const el = document.createElement('div');
+      el.className = 'card warning';
+      el.innerHTML = `
+        <div class="card-header">
+          <span class="lib-badge purple">⚠️ HARDCODED VALUE</span>
+        </div>
+        <div class="node-name">${issue.nodeName}</div>
+        <div class="real-name">Property: ${issue.property}</div>
+        <div class="token-detail">
+          <span class="token-actual">${issue.actualValue}px</span>
+          <span class="token-arrow">→</span>
+          <span class="token-expected">${issue.nearestToken}px</span>
+        </div>
+        <button class="btn btn-ghost goto-btn" data-node="${issue.nodeId}">Select Layer</button>
+      `;
+      list.appendChild(el);
+    });
+
+    list.querySelectorAll('.goto-btn').forEach(btn => {
+      btn.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: 'FOCUS_NODE', nodeId: btn.dataset.node } }, '*');
+      };
+    });
+  }
+
+  // ===== RENDER ICONS =====
+  function renderIcons(issues) {
+    const empty = document.getElementById('icon-empty');
+    const list = document.getElementById('icon-list');
+
+    if (issues.length === 0) {
+      empty.style.display = 'none';
+      list.innerHTML = '<div class="success-state">All icons are from Foundry Icons! ✅</div>';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = '<div style="margin-bottom:8px;font-size:11px;font-weight:600;">' + issues.length + ' non-Foundry icons detected</div>';
+
+    issues.forEach(issue => {
+      const el = document.createElement('div');
+      el.className = 'card info';
+      el.innerHTML = `
+        <div class="card-header">
+          <span class="lib-badge red">🔴 NON-FOUNDRY ICON</span>
+        </div>
+        <div class="node-name">${issue.nodeName}</div>
+        <div class="real-name">Icon: ${issue.iconName}</div>
+        <button class="btn btn-ghost goto-btn" data-node="${issue.nodeId}">Select Layer</button>
+      `;
+      list.appendChild(el);
+    });
+
+    list.querySelectorAll('.goto-btn').forEach(btn => {
+      btn.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: 'FOCUS_NODE', nodeId: btn.dataset.node } }, '*');
+      };
+    });
+  }
+
+  // ===== RENDER HISTORY =====
+  function renderHistory(data) {
+    const list = document.getElementById('history-list');
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div style="font-size:10px;color:#9ca3af;padding:8px 0;">No history yet</div>';
+      return;
+    }
+
+    list.innerHTML = data.slice(-20).reverse().map(s => {
+      const date = new Date(s.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const total = s.foundryCount + s.legacyCount;
+      const pct = total > 0 ? Math.round((s.foundryCount / total) * 100) : 0;
+      return `
+        <div class="history-row">
+          <span class="date">${date}</span>
+          <span class="stat">${pct}% · ${s.foundryCount}F / ${s.legacyCount}L · ${s.tokenErrorCount}T ${s.iconErrorCount}I</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ===== EXTRACTOR =====
+  document.getElementById('extractor-unlock-btn').onclick = () => {
+    const password = document.getElementById('extractor-password').value;
+    if (password === 'Foundry123$') {
+      document.getElementById('extractor-gate').style.display = 'none';
+      document.getElementById('extractor-content').style.display = 'block';
+      document.getElementById('extractor-error').textContent = '';
+      parent.postMessage({ pluginMessage: { type: 'GET_EXTRACTED_COUNT' } }, '*');
+    } else {
+      document.getElementById('extractor-error').textContent = '❌ Incorrect password';
+    }
+  };
+
+  document.getElementById('extractor-password').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('extractor-unlock-btn').click();
+  });
+
+  document.getElementById('extract-btn').onclick = () => {
+    const btn = document.getElementById('extract-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Extracting...';
+    document.getElementById('extract-status').textContent = 'Walking all pages and components...';
+    const password = document.getElementById('extractor-password').value;
+    parent.postMessage({ pluginMessage: { type: 'EXTRACT_KEYS', password } }, '*');
+  };
+
+  // ===== CLIPBOARD =====
+  function copyTextToClipboard(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) { console.error(e); }
+    document.body.removeChild(ta);
+  }
+</script>
+</body>
+</html>
