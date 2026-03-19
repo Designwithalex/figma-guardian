@@ -58,12 +58,14 @@ export interface IconIssue {
 
 export interface AnalyticsSnapshot {
   timestamp: number;
+  fileName: string;
   pageId: string;
   pageName: string;
   foundryCount: number;
   legacyCount: number;
   tokenErrorCount: number;
   iconErrorCount: number;
+  extractedComponents: { key: string; name: string; type: 'FOUNDRY' | 'LEGACY' }[];
 }
 
 // --- Aggregated Scan Results ---
@@ -82,6 +84,7 @@ export interface ScanResults {
   tokenIssues: TokenIssue[];
   iconIssues: IconIssue[];
   summary: ScanSummary;
+  extractedComponents: { key: string; name: string; type: 'FOUNDRY' | 'LEGACY' }[];
 }
 
 // --- Message Types (main <-> UI) ---

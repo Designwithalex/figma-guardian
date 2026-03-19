@@ -242,6 +242,7 @@ async function runFullScan() {
   const componentIssues: ComponentIssue[] = [];
   const tokenIssues: TokenIssue[] = [];
   const iconIssues: IconIssue[] = [];
+  const extractedComponents: { key: string; name: string; type: 'FOUNDRY' | 'LEGACY' }[] = [];
   let foundryCount = 0;
 
   const instances = figma.currentPage.findAll(n => n.type === 'INSTANCE') as InstanceNode[];
@@ -272,7 +273,9 @@ async function runFullScan() {
       const isFoundryComp = isFoundryComponent(currentKey, componentName, parentKey, parentName);
       if (isFoundryComp) {
         foundryCount++;
+        extractedComponents.push({ key: currentKey, name: mainComponent.name, type: 'FOUNDRY' });
       } else {
+        extractedComponents.push({ key: currentKey, name: mainComponent.name, type: 'LEGACY' });
         let libraryName = 'External Library';
         try {
           if (mainComponent.remote) {
@@ -339,7 +342,7 @@ async function runFullScan() {
     healthScore: totalInstances > 0 ? Math.round((foundryCount / totalInstances) * 100) : 100,
   };
 
-  const results: ScanResults = { componentIssues, tokenIssues, iconIssues, summary };
+  const results: ScanResults = { componentIssues, tokenIssues, iconIssues, summary, extractedComponents };
   await saveSnapshot(results);
   figma.ui.postMessage({ type: 'SCAN_RESULTS', data: results });
   figma.notify(`🛡️ Scan complete: ${summary.healthScore}% Foundry adoption`);
@@ -362,9 +365,15 @@ async function saveSnapshot(results: ScanResults): Promise<void> {
   try {
     const history = await getHistory();
     const snapshot: AnalyticsSnapshot = {
-      timestamp: Date.now(), pageId: figma.currentPage.id, pageName: figma.currentPage.name,
-      foundryCount: results.summary.foundryCount, legacyCount: results.summary.legacyCount,
-      tokenErrorCount: results.summary.tokenErrors, iconErrorCount: results.summary.iconErrors,
+      timestamp: Date.now(),
+      fileName: figma.root.name,
+      pageId: figma.currentPage.id,
+      pageName: figma.currentPage.name,
+      foundryCount: results.summary.foundryCount,
+      legacyCount: results.summary.legacyCount,
+      tokenErrorCount: results.summary.tokenErrors,
+      iconErrorCount: results.summary.iconErrors,
+      extractedComponents: results.extractedComponents
     };
     history.push(snapshot);
     await figma.clientStorage.setAsync(STORAGE_KEY, history.slice(-MAX_HISTORY));
