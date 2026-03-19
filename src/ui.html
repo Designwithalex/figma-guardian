@@ -733,21 +733,21 @@
     const s = window._historyData[index];
     if (!s || !s.extractedComponents) return;
     
-    let csvContent = "Report Date,File Name,Page Name,Component Type,Component Name,Component Key\\n";
+    let csvContent = "Report Date,File Name,Page Name,Component Type,Component Name,Component Key\n";
     s.extractedComponents.forEach(c => {
       const dateStr = new Date(s.timestamp).toLocaleString('en-US');
       const row = [dateStr, s.fileName || 'Unknown File', s.pageName || 'Unknown Page', c.type, c.name, c.key]
         .map(field => '"' + (field || '').replace(/"/g, '""') + '"')
         .join(",");
-      csvContent += row + "\\n";
+      csvContent += row + "\n";
     });
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    const safeName = (s.fileName || 'report').replace(/\\s+/g, '_');
-    link.setAttribute("download", \`foundry_report_\${safeName}_\${s.timestamp}.csv\`);
+    const safeName = (s.fileName || 'report').replace(/\s+/g, '_');
+    link.setAttribute("download", `foundry_report_${safeName}_${s.timestamp}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
